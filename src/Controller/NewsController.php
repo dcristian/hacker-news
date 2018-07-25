@@ -3,6 +3,7 @@
 namespace Controller;
 
 use Silex\Application;
+use GuzzleHttp\Client;
 
 class NewsController
 {
@@ -10,21 +11,38 @@ class NewsController
 
     /**
      * @param Application $app
-     *
      * @return mixed
      */
     public function getAll(Application $app)
     {
-        $content = file_get_contents(NewsController::BASE_URL . 'topstories.json');
-        $json = json_decode($content, true);
+        $client = new Client();
+
+        try {
+            $res = $client->request('GET', NewsController::BASE_URL . 'topstories.json');
+        } catch(\GuzzleHttp\Exception\GuzzleException $exception) {
+            return $app['twig']->render('errors\default.html.twig');
+        }
+
+        if ($res->getStatusCode() !== 200) {
+            return $app['twig']->render('errors\default.html.twig');
+        }
+        $json = json_decode($res->getBody(), true);
 
         // TODO: use this to limit the number of results and remove it from the loop
-        $limit = 10;
+        $limit = 30;
         $results = [];
 
         for ($i = 0; $i<$limit; $i++) {
-           $contentItem = file_get_contents(NewsController::BASE_URL . '/item/' . $json[$i] . '.json');
-           $jsonItem = json_decode($contentItem, true);
+            try {
+                $res = $client->request('GET', NewsController::BASE_URL . '/item/' . $json[$i] . '.json');
+            } catch(\GuzzleHttp\Exception\GuzzleException $exception) {
+                return $app['twig']->render('errors\default.html.twig');
+            }
+
+            if ($res->getStatusCode() !== 200) {
+                return $app['twig']->render('errors\default.html.twig');
+            }
+            $jsonItem = json_decode($res->getBody(), true);
 
            $results[] = [
                'title' => $jsonItem['title'],

@@ -1,27 +1,24 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-    <div class="container mt-4">
-        {% include 'navbar.html.twig' %}
-        <table class="table">
-            <tbody>
-            {% for result in results %}
-                <tr>
-                    <td scope="col">{{ loop.index }}</td>
-                    <td scope="col">
-                        <a href="{{ result.url }}" target="_blank">
-                            {{ result.title }}
-                        </a>
-                        {% if result.baseUrl %}({{ result.baseUrl }}){% endif %}
-                        <br/>
-                        <small>
-                            {{ result.score }} points by {{ result.author }} {{ result.age }} ago | hide
-                            {% if result.comments %}| {{ result.comments }} comments{% endif %}
-                        </small>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <table class="table">
+        <tbody>
+        {% for result in results %}
+            <tr>
+                <td scope="col">{{ loop.index }}</td>
+                <td scope="col">
+                    <a href="{{ result.url }}" target="_blank">
+                        {{ result.title }}
+                    </a>
+                    {% if result.baseUrl %}({{ result.baseUrl }}){% endif %}
+                    <br/>
+                    <small>
+                        {{ result.score }} points by {{ result.author }} {{ result.age }} ago | hide
+                        {% if result.comments %}| {{ result.comments }} comments{% endif %}
+                    </small>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
