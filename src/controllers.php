@@ -3,11 +3,7 @@
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-$app->get('/', function () use ($app) {
-    return $app['twig']->render('index.html.twig', array());
-})->bind('homepage');
-
-$app->mount('/news', new \Controller\Provider\News());
+$app->mount('/', new \Controller\Provider\News());
 
 $app->error(function (\Exception $e, Request $request, $code) use ($app) {
     if ($app['debug']) {
