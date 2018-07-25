@@ -6,7 +6,7 @@ use Silex\Api\ControllerProviderInterface;
 use Silex\Application;
 use Silex\ControllerCollection;
 
-class News implements ControllerProviderInterface
+class ItemProvider implements ControllerProviderInterface
 {
     /**
      * @param Application $app
@@ -17,7 +17,8 @@ class News implements ControllerProviderInterface
     {
         $news = $app['controllers_factory'];
 
-        $news->get('/', 'Controller\\NewsController::getAll');
+        $news->get('/', 'Controller\\ItemController::getAll')->bind('homepage');
+        $news->get('/item/{id}', 'Controller\\ItemController::get')->bind('item');
 
         return $news;
     }

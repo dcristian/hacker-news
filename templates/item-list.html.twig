@@ -13,8 +13,13 @@
                     {% if result.baseUrl %}({{ result.baseUrl }}){% endif %}
                     <br/>
                     <small>
-                        {{ result.score }} points by {{ result.author }} {{ result.age }} ago | hide
-                        {% if result.comments %}| {{ result.comments }} comments{% endif %}
+                        {{ result.score }} points by {{ result.author }}
+                        <a href="{{ path('item', {id: result.id}) }}">
+                            {{ result.age }} ago
+                        </a>
+                        <a href="{{ path('item', {id: result.id}) }}">
+                            | {% if result.totalComments %} {{ result.totalComments }} comments {% else %} discuss {% endif %}
+                        </a>
                     </small>
                 </td>
             </tr>
