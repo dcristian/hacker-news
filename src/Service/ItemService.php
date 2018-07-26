@@ -21,6 +21,7 @@ class ItemService
 
     /**
      * @param ApiService $apiService
+     * @param UrlGenerator $urlGenerator
      */
     public function __construct(ApiService $apiService, UrlGenerator $urlGenerator)
     {

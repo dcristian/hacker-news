@@ -42,29 +42,7 @@ class ItemController
      */
     public function getTopStories(Application $app, Request $request)
     {
-        $limit = 30;
-        $page = $request->query->get('page', 1);
-
-        try {
-            $result = $app['item.service']->getTopStories($limit, $page);
-        } catch(GuzzleException $exception) {
-            return $app['twig']->render('errors\default.html.twig');
-        } catch (\Exception $exception) {
-            return $app['twig']->render('errors\default.html.twig');
-        }
-
-        $nextPageNumber = $page + 1;
-
-        $nextPage = null;
-        if ($nextPageNumber <= $result['totalPages']) {
-            $nextPage = $app['url_generator']->generate('homepage', ['page' => ($nextPageNumber)]);
-        }
-
-        return $app['twig']->render('item-list.html.twig', [
-            'itemList' => $result['itemList'],
-            'itemStartIndex' => $limit * ($page-1),
-            'nextPage' => $nextPage
-        ]);
+        return $this->getItemList($app, $request, 'top');
     }
 
     /**
@@ -75,29 +53,7 @@ class ItemController
      */
     public function getNewStories(Application $app, Request $request)
     {
-        $limit = 30;
-        $page = $request->query->get('page', 1);
-
-        try {
-            $result = $app['item.service']->getNewStories($limit, $page);
-        } catch(GuzzleException $exception) {
-            return $app['twig']->render('errors\default.html.twig');
-        } catch (\Exception $exception) {
-            return $app['twig']->render('errors\default.html.twig');
-        }
-
-        $nextPageNumber = $page + 1;
-
-        $nextPage = null;
-        if ($nextPageNumber <= $result['totalPages']) {
-            $nextPage = $app['url_generator']->generate('newest', ['page' => ($nextPageNumber)]);
-        }
-
-        return $app['twig']->render('item-list.html.twig', [
-            'itemList' => $result['itemList'],
-            'itemStartIndex' => $limit * ($page-1),
-            'nextPage' => $nextPage
-        ]);
+        return $this->getItemList($app, $request, 'new');
     }
 
     /**
@@ -108,29 +64,7 @@ class ItemController
      */
     public function getShowStories(Application $app, Request $request)
     {
-        $limit = 30;
-        $page = $request->query->get('page', 1);
-
-        try {
-            $result = $app['item.service']->getShowStories($limit, $page);
-        } catch(GuzzleException $exception) {
-            return $app['twig']->render('errors\default.html.twig');
-        } catch (\Exception $exception) {
-            return $app['twig']->render('errors\default.html.twig');
-        }
-
-        $nextPageNumber = $page + 1;
-
-        $nextPage = null;
-        if ($nextPageNumber <= $result['totalPages']) {
-            $nextPage = $app['url_generator']->generate('show', ['page' => ($nextPageNumber)]);
-        }
-
-        return $app['twig']->render('item-list.html.twig', [
-            'itemList' => $result['itemList'],
-            'itemStartIndex' => $limit * ($page-1),
-            'nextPage' => $nextPage
-        ]);
+        return $this->getItemList($app, $request, 'show');
     }
 
     /**
@@ -141,11 +75,44 @@ class ItemController
      */
     public function getAskStories(Application $app, Request $request)
     {
+        return $this->getItemList($app, $request, 'ask');
+    }
+
+
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @param string $type
+     *
+     * @return mixed
+     */
+    private function getItemList(Application $app, Request $request, string $type)
+    {
         $limit = 30;
         $page = $request->query->get('page', 1);
+        $result = [];
+        $pathName = null;
+
+        $itemService = $app['item.service'];
 
         try {
-            $result = $app['item.service']->getAskStories($limit, $page);
+            switch ($type) {
+                case 'top':
+                    $result = $itemService->getTopStories($limit, $page);
+                    $pathName = 'homepage';
+                    break;
+                case 'new':
+                    $result = $itemService->getNewStories($limit, $page);
+                    $pathName = 'newest';
+                    break;
+                case 'show':
+                    $result = $itemService->getShowStories($limit, $page);
+                    $pathName = 'show';
+                    break;
+                case 'ask':
+                    $result = $itemService->getAskStories($limit, $page);
+                    $pathName = 'ask';
+            }
         } catch(GuzzleException $exception) {
             return $app['twig']->render('errors\default.html.twig');
         } catch (\Exception $exception) {
@@ -156,7 +123,7 @@ class ItemController
 
         $nextPage = null;
         if ($nextPageNumber <= $result['totalPages']) {
-            $nextPage = $app['url_generator']->generate('ask', ['page' => ($nextPageNumber)]);
+            $nextPage = $app['url_generator']->generate($pathName, ['page' => ($nextPageNumber)]);
         }
 
         return $app['twig']->render('item-list.html.twig', [
