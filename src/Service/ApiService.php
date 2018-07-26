@@ -3,6 +3,8 @@
 namespace Service;
 
 use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Exception\GuzzleException;
 
 class ApiService
 {
@@ -30,11 +32,11 @@ class ApiService
     }
 
     /**
-     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
-    public function getTopStories()
+    public function getTopStories(): ResponseInterface
     {
         return $this->client->request('GET', $this->baseUrl . ApiService::TOP_STORIES_PATH);
     }
@@ -42,11 +44,11 @@ class ApiService
     /**
      * @param int $itemId
      *
-     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
-    public function getItem(int $itemId)
+    public function getItem(int $itemId): ResponseInterface
     {
         $path = sprintf(ApiService::ITEM_PATH, $itemId);
 

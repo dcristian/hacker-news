@@ -1,35 +1,16 @@
-{% extends "layout.html.twig" %}
-
 {% block content %}
-    <div class="mt-2">
-        {# Item #}
-        <a href="{{ item.url }}" target="_blank">
-            {{ item.title }}
+    <a href="{{ item.url }}" target="_blank">
+        {{ item.title }}
+    </a>
+    {% if item.baseUrl %}({{ item.baseUrl }}){% endif %}
+    <br/>
+    <small>
+        {{ item.score }} points by {{ item.author }}
+        <a href="{{ path('item', {id: item.id}) }}">
+            {{ item.age }} ago
         </a>
-        {% if item.baseUrl %}({{ item.baseUrl }}){% endif %}
-        <br/>
-        <small>
-            {{ item.score }} points by {{ item.author }} {{ item.age }} ago
+        <a href="{{ path('item', {id: item.id}) }}">
             | {% if item.totalComments %} {{ item.totalComments }} comments {% else %} discuss {% endif %}
-        </small>
-
-        <h4 class="mt-4">Comments</h4>
-
-        {# Comments #}
-        <table class="table">
-            <tbody>
-            {% for comment in item.comments %}
-                <tr>
-                    <td scope="col">
-                        <small>
-                            {{ comment.author }} {{ comment.age }} ago
-                        </small>
-                        <br/>
-                        {{ comment.text | raw }}
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        </a>
+    </small>
 {% endblock %}

@@ -3,27 +3,17 @@
 {% block content %}
     <table class="table">
         <tbody>
-        {% for result in results %}
+        {% for item in itemList %}
             <tr>
-                <td scope="col">{{ loop.index }}</td>
+                <td scope="col">{{ startIndex + loop.index }}</td>
                 <td scope="col">
-                    <a href="{{ result.url }}" target="_blank">
-                        {{ result.title }}
-                    </a>
-                    {% if result.baseUrl %}({{ result.baseUrl }}){% endif %}
-                    <br/>
-                    <small>
-                        {{ result.score }} points by {{ result.author }}
-                        <a href="{{ path('item', {id: result.id}) }}">
-                            {{ result.age }} ago
-                        </a>
-                        <a href="{{ path('item', {id: result.id}) }}">
-                            | {% if result.totalComments %} {{ result.totalComments }} comments {% else %} discuss {% endif %}
-                        </a>
-                    </small>
+                    {% include 'item.html.twig' with {'item': item} %}
                 </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+    <a class="mb-4" href="{{ path('homepage') }}?page={{ page + 1 }}">More</a>
+    <br>
+    <br>
 {% endblock %}

@@ -20,24 +20,39 @@ class ItemService
     }
 
     /**
+     * @param int $limit
+     * @param int $page
+     *
      * @return array
      *
      * @throws GuzzleException|\Exception
      */
-    public function getAll()
+    public function getAll(int $limit = 30, int $page = 1): array
     {
-        $res = $this->apiService->getTopStories();
+        $response = $this->apiService->getTopStories();
 
-        if ($res->getStatusCode() !== 200) {
-            throw new \Exception('The API request failed with status code ' . $res->getStatusCode());
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('The API request failed with status code ' . $response->getStatusCode());
         }
-        $json = json_decode($res->getBody(), true);
 
-        $limit = 30;
+        $itemIds = json_decode($response->getBody(), true);
+
+        /**
+         * Manual pagination because the he API does not support limit and offset parameters
+         */
+        $end = $page * $limit;
+        $start = $end - $limit;
+        $last = count($itemIds) - 1;
+
+        if ($start > $last) {
+            throw new \Exception('Wrong page number!');
+        }
+
+        $end = min($end, $last);
+
         $results = [];
-
-        for ($i = 0; $i<$limit; $i++) {
-            $results[] = $this->get($json[$i]);
+        for ($i = $start; $i<$end; $i++) {
+            $results[] = $this->get($itemIds[$i]);
         }
 
         return $results;
@@ -51,31 +66,82 @@ class ItemService
      *
      * @throws GuzzleException|\Exception
      */
-    public function get(int $id, $withComments = false)
+    public function get(int $id, $withComments = false): array
     {
-        $res = $this->apiService->getItem($id);
+        $response = $this->apiService->getItem($id);
 
-        if ($res->getStatusCode() !== 200) {
-            throw new \Exception('The API request failed with status code ' . $res->getStatusCode());
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('The API request failed with status code ' . $response->getStatusCode());
         }
-        $json = json_decode($res->getBody(), true);
+
+        $item = json_decode($response->getBody(), true);
 
         $result = [
-            'title' => $json['title'],
-            'url' => $this->getValue($json, 'url'),
-            'baseUrl' => $this->getBaseUrl($json),
-            'author' => $json['by'],
-            'score' => $json['score'],
-            'totalComments' => $this->getValue($json, 'descendants'),
-            'age' => $this->getAge($json),
-            'id' => $json['id']
+            'title' => $item['title'],
+            'url' => $this->getValue($item, 'url'),
+            'baseUrl' => $this->getBaseUrl($item),
+            'author' => $item['by'],
+            'score' => $item['score'],
+            'totalComments' => $this->getValue($item, 'descendants'),
+            'age' => $this->getAge($item),
+            'id' => $item['id']
         ];
 
         if ($withComments) {
-            $result['comments'] = $this->getComments($json);
+            $result['comments'] = $this->getComments($item);
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $item
+     *
+     * @return array
+     *
+     * @throws GuzzleException|\Exception
+     */
+    private function getComments(array $item): array
+    {
+        $kids = isset($item['kids']) ? $item['kids'] : [];
+
+        $comments = [];
+        foreach ($kids as $id) {
+            $comments[] = $this->getComment($id);
+        }
+
+        return $comments;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return array
+     *
+     * @throws GuzzleException|\Exception
+     */
+    private function getComment(int $id): array
+    {
+        $response = $this->apiService->getItem($id);
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('The API request failed with status code ' . $response->getStatusCode());
+        }
+
+        $comment = json_decode($response->getBody(), true);
+
+        if (isset($comment['deleted']) && $comment['deleted']) {
+            return [
+                'text' => 'Deleted',
+                'author' => 'Deleted',
+                'age' => $this->getAge($comment)
+            ];
+        }
+
+        return [
+            'text' => $comment['text'],
+            'author' => $comment['by'],
+            'age' => $this->getAge($comment)
+        ];
     }
 
     /**
@@ -84,7 +150,8 @@ class ItemService
      *
      * @return mixed|null
      */
-    private function getValue(array $item, $key) {
+    private function getValue(array $item, $key)
+    {
         return isset($item[$key]) ? $item[$key] : null;
     }
 
@@ -99,9 +166,9 @@ class ItemService
             return null;
         }
 
-        $parse = parse_url($item['url']);
+        $hostUrl = parse_url($item['url'], PHP_URL_HOST);
 
-        return preg_replace('#^www\.(.+\.)#i', '$1', $parse['host']);
+        return preg_replace('#^www\.(.+\.)#i', '$1', $hostUrl);
     }
 
     /**
@@ -109,7 +176,7 @@ class ItemService
      *
      * @return string
      */
-    private function getAge(array $item)
+    private function getAge(array $item): string
     {
         $createdAt = new \DateTime('@' . $item['time']);
         $now = new \DateTime();
@@ -130,55 +197,5 @@ class ItemService
         }
 
         return '0 minutes';
-    }
-
-    /**
-     * @param array $item
-     *
-     * @return array
-     *
-     * @throws GuzzleException|\Exception
-     */
-    private function getComments(array $item)
-    {
-        $kids = isset($item['kids']) ? $item['kids'] : [];
-
-        $comments = [];
-        foreach ($kids as $id) {
-            $comments[] = $this->getComment($id);
-        }
-
-        return $comments;
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return array
-     *
-     * @throws GuzzleException|\Exception
-     */
-    private function getComment(int $id)
-    {
-        $res = $this->apiService->getItem($id);
-
-        if ($res->getStatusCode() !== 200) {
-            throw new \Exception('The API request failed with status code ' . $res->getStatusCode());
-        }
-        $json = json_decode($res->getBody(), true);
-
-        if (isset($json['deleted']) && $json['deleted']) {
-            return [
-                'text' => 'Deleted',
-                'author' => 'Deleted',
-                'age' => $this->getAge($json)
-            ];
-        }
-
-        return [
-            'text' => $json['text'],
-            'author' => $json['by'],
-            'age' => $this->getAge($json)
-        ];
     }
 }
