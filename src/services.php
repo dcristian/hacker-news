@@ -10,7 +10,7 @@ $app['api.service'] = function ($app) {
 };
 
 $app['item.service'] = function ($app) {
-    return new ItemService($app['api.service']);
+    return new ItemService($app['api.service'], $app['url_generator']);
 };
 
 $app['user.service'] = function ($app) {

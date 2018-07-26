@@ -18,8 +18,10 @@ class ItemProvider implements ControllerProviderInterface
         $news = $app['controllers_factory'];
 
         $news->get('/', 'Controller\\ItemController::getTopStories')->bind('homepage');
-        $news->get('/newest', 'Controller\\ItemController::getNewStories')->bind('newest');
         $news->get('/item/{id}', 'Controller\\ItemController::get')->bind('item');
+        $news->get('/newest', 'Controller\\ItemController::getNewStories')->bind('newest');
+        $news->get('/show', 'Controller\\ItemController::getShowStories')->bind('show');
+        $news->get('/ask', 'Controller\\ItemController::getAskStories')->bind('ask');
 
         return $news;
     }

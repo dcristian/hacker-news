@@ -5,6 +5,7 @@ namespace Service;
 use \GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Generator\UrlGenerator;
 
 class ItemService
 {
@@ -14,11 +15,17 @@ class ItemService
     private $apiService;
 
     /**
+     * @var UrlGenerator
+     */
+    private $urlGenerator;
+
+    /**
      * @param ApiService $apiService
      */
-    public function __construct(ApiService $apiService)
+    public function __construct(ApiService $apiService, UrlGenerator $urlGenerator)
     {
         $this->apiService = $apiService;
+        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -49,6 +56,43 @@ class ItemService
         $response = $this->apiService->getNewStories();
 
         return $this->getAll($response, $limit, $page);
+    }
+
+    /**
+     * @param int $limit
+     * @param int $page
+     *
+     * @return array
+     *
+     * @throws GuzzleException|\Exception
+     */
+    public function getShowStories(int $limit = 30, int $page = 1): array
+    {
+        $response = $this->apiService->getShowStories();
+
+        return $this->getAll($response, $limit, $page);
+    }
+
+    /**
+     * @param int $limit
+     * @param int $page
+     *
+     * @return array
+     *
+     * @throws GuzzleException|\Exception
+     */
+    public function getAskStories(int $limit = 30, int $page = 1): array
+    {
+        $response = $this->apiService->getAskStories();
+        $result = $this->getAll($response, $limit, $page);
+
+        foreach($result['itemList'] as &$item) {
+            $item['url'] = $this->urlGenerator->generate('item', [
+                'id' => $item['id']
+            ]);
+        }
+
+        return $result;
     }
 
     /**

@@ -42,7 +42,7 @@ class UserService
 
         return [
             'id' => $user['id'],
-            'about' => $user['about'],
+            'about' => isset($user['about']) ? $user['about'] : null,
             'karma' => $user['karma'],
             'created' => $user['created'],
         ];

@@ -12,6 +12,8 @@ class ApiService
     const USER_PATH = '/user/%s.json';
     const TOP_STORIES_PATH = '/topstories.json';
     const NEW_STORIES_PATH = '/newstories.json';
+    const SHOW_STORIES_PATH = '/showstories.json';
+    const ASK_STORIES_PATH = '/askstories.json';
 
     /**
      * @var Client
@@ -79,5 +81,25 @@ class ApiService
     public function getNewStories()
     {
         return $this->client->request('GET', $this->baseUrl . ApiService::NEW_STORIES_PATH);
+    }
+
+    /**
+     * @return ResponseInterface
+     *
+     * @throws GuzzleException
+     */
+    public function getShowStories()
+    {
+        return $this->client->request('GET', $this->baseUrl . ApiService::SHOW_STORIES_PATH);
+    }
+
+    /**
+     * @return ResponseInterface
+     *
+     * @throws GuzzleException
+     */
+    public function getAskStories()
+    {
+        return $this->client->request('GET', $this->baseUrl . ApiService::ASK_STORIES_PATH);
     }
 }
