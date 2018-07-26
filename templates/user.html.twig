@@ -1,0 +1,24 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <table class="table">
+        <tbody>
+            <tr>
+                <td scope="col">User: </td>
+                <td scope="col">{{ user.id }}</td>
+            </tr>
+            <tr>
+                <td scope="col">Created: </td>
+                <td scope="col">{{ user.created | date('F d, Y') }}</td>
+            </tr>
+            <tr>
+                <td scope="col">Karma: </td>
+                <td scope="col">{{ user.karma }}</td>
+            </tr>
+            <tr>
+                <td scope="col">About: </td>
+                <td scope="col">{{ user.about | raw }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

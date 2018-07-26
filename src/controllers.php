@@ -4,6 +4,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 $app->mount('/', new \Controller\Provider\ItemProvider());
+$app->mount('/user', new \Controller\Provider\UserProvider());
 
 $app->error(function (\Exception $e, Request $request, $code) use ($app) {
     if ($app['debug']) {

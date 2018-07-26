@@ -14,7 +14,10 @@
                 <tr>
                     <td scope="col">
                         <small>
-                            {{ comment.author }} {{ comment.age }} ago
+                            <a href="{{ path('user', {id: comment.author}) }}">
+                                {{ comment.author }}
+                            </a>
+                            {{ comment.age }} ago
                         </small>
                         <br/>
                         {{ comment.text | raw }}

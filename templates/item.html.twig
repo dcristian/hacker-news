@@ -5,7 +5,10 @@
     {% if item.baseUrl %}({{ item.baseUrl }}){% endif %}
     <br/>
     <small>
-        {{ item.score }} points by {{ item.author }}
+        {{ item.score }} points by
+        <a href="{{ path('user', {id: item.author}) }}">
+            {{ item.author }}
+        </a>
         <a href="{{ path('item', {id: item.id}) }}">
             {{ item.age }} ago
         </a>

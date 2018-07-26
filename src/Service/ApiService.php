@@ -9,6 +9,7 @@ use GuzzleHttp\Exception\GuzzleException;
 class ApiService
 {
     const ITEM_PATH = '/item/%d.json';
+    const USER_PATH = '/user/%s.json';
     const TOP_STORIES_PATH = '/topstories.json';
     const NEW_STORIES_PATH = '/newstories.json';
 
@@ -33,15 +34,29 @@ class ApiService
     }
 
     /**
-     * @param int $itemId
+     * @param int $id
      *
      * @return ResponseInterface
      *
      * @throws GuzzleException
      */
-    public function getItem(int $itemId): ResponseInterface
+    public function getItem(int $id): ResponseInterface
     {
-        $path = sprintf(ApiService::ITEM_PATH, $itemId);
+        $path = sprintf(ApiService::ITEM_PATH, $id);
+
+        return $this->client->request('GET', $this->baseUrl . $path);
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return ResponseInterface
+     *
+     * @throws GuzzleException
+     */
+    public function getUser(string $id)
+    {
+        $path = sprintf(ApiService::USER_PATH, $id);
 
         return $this->client->request('GET', $this->baseUrl . $path);
     }
