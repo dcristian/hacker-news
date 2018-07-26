@@ -5,7 +5,7 @@
         <tbody>
         {% for item in itemList %}
             <tr>
-                <td scope="col">{{ startIndex + loop.index }}</td>
+                <td scope="col">{{ itemStartIndex + loop.index }}</td>
                 <td scope="col">
                     {% include 'item.html.twig' with {'item': item} %}
                 </td>
@@ -13,7 +13,9 @@
         {% endfor %}
         </tbody>
     </table>
-    <a class="mb-4" href="{{ path('homepage') }}?page={{ page + 1 }}">More</a>
-    <br>
-    <br>
+    {% if nextPage %}
+        <a class="mb-4" href="{{ nextPage }}">More</a>
+        <br>
+        <br>
+    {% endif %}
 {% endblock %}

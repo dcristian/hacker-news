@@ -17,7 +17,8 @@ class ItemProvider implements ControllerProviderInterface
     {
         $news = $app['controllers_factory'];
 
-        $news->get('/', 'Controller\\ItemController::getAll')->bind('homepage');
+        $news->get('/', 'Controller\\ItemController::getTopStories')->bind('homepage');
+        $news->get('/newest', 'Controller\\ItemController::getNewStories')->bind('newest');
         $news->get('/item/{id}', 'Controller\\ItemController::get')->bind('item');
 
         return $news;

@@ -3,6 +3,7 @@
 namespace Service;
 
 use \GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Message\ResponseInterface;
 
 class ItemService
 {
@@ -27,10 +28,39 @@ class ItemService
      *
      * @throws GuzzleException|\Exception
      */
-    public function getAll(int $limit = 30, int $page = 1): array
+    public function getTopStories(int $limit = 30, int $page = 1): array
     {
         $response = $this->apiService->getTopStories();
 
+        return $this->getAll($response, $limit, $page);
+    }
+
+    /**
+     * @param int $limit
+     * @param int $page
+     *
+     * @return array
+     *
+     * @throws GuzzleException|\Exception
+     */
+    public function getNewStories(int $limit = 30, int $page = 1): array
+    {
+        $response = $this->apiService->getNewStories();
+
+        return $this->getAll($response, $limit, $page);
+    }
+
+    /**
+     * @param ResponseInterface $response
+     * @param int $limit
+     * @param int $page
+     *
+     * @return array
+     *
+     * @throws GuzzleException|\Exception
+     */
+    private function getAll(ResponseInterface $response, int $limit, int $page): array
+    {
         if ($response->getStatusCode() !== 200) {
             throw new \Exception('The API request failed with status code ' . $response->getStatusCode());
         }
@@ -38,24 +68,27 @@ class ItemService
         $itemIds = json_decode($response->getBody(), true);
 
         /**
-         * Manual pagination because the he API does not support limit and offset parameters
+         * Manual pagination because the API does not support limit and offset parameters
          */
-        $end = $page * $limit;
-        $start = $end - $limit;
+        $totalPages = ceil(count($itemIds) / $limit);
+
+        if ($page > $totalPages) {
+            throw new \Exception('Page number too big!');
+        }
+
         $last = count($itemIds) - 1;
+        $start = ($page - 1) * $limit;
+        $end = min($start + $limit, $last);
 
-        if ($start > $last) {
-            throw new \Exception('Wrong page number!');
-        }
-
-        $end = min($end, $last);
-
-        $results = [];
+        $result = [
+            'totalPages' => $totalPages,
+            'itemList' => []
+        ];
         for ($i = $start; $i<$end; $i++) {
-            $results[] = $this->get($itemIds[$i]);
+            $result['itemList'][] = $this->get($itemIds[$i]);
         }
 
-        return $results;
+        return $result;
     }
 
     /**

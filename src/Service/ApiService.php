@@ -8,8 +8,9 @@ use GuzzleHttp\Exception\GuzzleException;
 
 class ApiService
 {
-    const TOP_STORIES_PATH = '/topstories.json';
     const ITEM_PATH = '/item/%d.json';
+    const TOP_STORIES_PATH = '/topstories.json';
+    const NEW_STORIES_PATH = '/newstories.json';
 
     /**
      * @var Client
@@ -32,16 +33,6 @@ class ApiService
     }
 
     /**
-     * @return ResponseInterface
-     *
-     * @throws GuzzleException
-     */
-    public function getTopStories(): ResponseInterface
-    {
-        return $this->client->request('GET', $this->baseUrl . ApiService::TOP_STORIES_PATH);
-    }
-
-    /**
      * @param int $itemId
      *
      * @return ResponseInterface
@@ -53,5 +44,25 @@ class ApiService
         $path = sprintf(ApiService::ITEM_PATH, $itemId);
 
         return $this->client->request('GET', $this->baseUrl . $path);
+    }
+
+    /**
+     * @return ResponseInterface
+     *
+     * @throws GuzzleException
+     */
+    public function getTopStories(): ResponseInterface
+    {
+        return $this->client->request('GET', $this->baseUrl . ApiService::TOP_STORIES_PATH);
+    }
+
+    /**
+     * @return ResponseInterface
+     *
+     * @throws GuzzleException
+     */
+    public function getNewStories()
+    {
+        return $this->client->request('GET', $this->baseUrl . ApiService::NEW_STORIES_PATH);
     }
 }
