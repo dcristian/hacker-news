@@ -4,6 +4,7 @@ namespace Service;
 
 use \GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ItemService
 {
@@ -108,6 +109,9 @@ class ItemService
         }
 
         $item = json_decode($response->getBody(), true);
+        if (!$item) {
+            throw new NotFoundHttpException('Item not found!');
+        }
 
         $result = [
             'title' => $item['title'],

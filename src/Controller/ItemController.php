@@ -5,6 +5,7 @@ namespace Controller;
 use Silex\Application;
 use \GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ItemController
 {
@@ -86,6 +87,10 @@ class ItemController
             $result = $app['item.service']->get($id, true);
         } catch(GuzzleException $exception) {
             return $app['twig']->render('errors\default.html.twig');
+        } catch (NotFoundHttpException $exception) {
+            return $app['twig']->render('errors\custom.html.twig', [
+                'message' => $exception->getMessage()
+            ]);
         } catch (\Exception $exception) {
             return $app['twig']->render('errors\default.html.twig');
         }
