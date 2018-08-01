@@ -1,6 +1,6 @@
 {
-    "name": "fabpot/silex-skeleton",
-    "description": "A pre-configured skeleton for the Silex microframework",
+    "name": "Hacker News",
+    "description": "A simple Hacker News like website written in PHP, using the Silex Skeleton",
     "license": "MIT",
     "type": "project",
     "require": {
