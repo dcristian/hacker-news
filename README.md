@@ -2,8 +2,6 @@
 
 A Hacker News clone written in PHP, using the [Silex Skeleton](https://github.com/silexphp/Silex-Skeleton "Title") and the official [HackerNews API](https://github.com/HackerNews/API "Title").
 
-Try the demo at [hacker-news-clone-silex.herokuapp.com](https://hacker-news-clone-silex.herokuapp.com/ "Title")
-
 ## Quick Start
 
 ``` shell
